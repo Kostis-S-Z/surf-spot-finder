@@ -1,4 +1,5 @@
 import os
+import json
 from datetime import datetime
 
 from opentelemetry import trace
@@ -11,13 +12,33 @@ from phoenix.otel import register
 class JsonFileSpanExporter(SpanExporter):
     def __init__(self, file_name: str):
         self.file_name = file_name
+        # Initialize with an empty array if file doesn't exist
+        if not os.path.exists(self.file_name):
+            with open(self.file_name, "w") as f:
+                json.dump([], f)
 
     def export(self, spans) -> None:
-        with open(self.file_name, "a") as f:
-            for span in spans:
-                f.write(
-                    span.to_json() + "\n"
-                )  # Ensure to_json() method is properly implemented
+        # Read existing spans
+        try:
+            with open(self.file_name, "r") as f:
+                all_spans = json.load(f)
+        except (json.JSONDecodeError, FileNotFoundError):
+            all_spans = []
+
+        # Add new spans
+        for span in spans:
+            try:
+                # Try to parse the span data from to_json() if it returns a string
+                span_data = json.loads(span.to_json())
+            except (json.JSONDecodeError, TypeError, AttributeError):
+                # If span.to_json() doesn't return valid JSON string
+                span_data = {"error": "Could not serialize span", "span_str": str(span)}
+
+            all_spans.append(span_data)
+
+        # Write all spans back to the file as a proper JSON array
+        with open(self.file_name, "w") as f:
+            json.dump(all_spans, f, indent=2)
 
     def shutdown(self):
         pass
@@ -25,7 +46,7 @@ class JsonFileSpanExporter(SpanExporter):
 
 def get_tracer_provider(
     project_name: str, json_tracer: bool, output_dir: str = "telemetry_output"
-) -> TracerProvider:
+) -> tuple[TracerProvider, str | None]:
     """
     Create a tracer_provider based on the selected mode.
 
@@ -37,7 +58,8 @@ def get_tracer_provider(
             Defaults to "telemetry_output".
 
     Returns:
-        TracerProvider: The configured tracer provider
+        tracer_provider: The configured tracer provider
+        file_name: The name of the JSON file where telemetry will be stored
     """
     if json_tracer:
         if not os.path.exists(output_dir):
@@ -47,15 +69,17 @@ def get_tracer_provider(
         tracer_provider = TracerProvider()
         trace.set_tracer_provider(tracer_provider)
 
-        json_file_exporter = JsonFileSpanExporter(
-            file_name=f"{output_dir}/{project_name}-{timestamp}.json"
-        )
+        file_name = f"{output_dir}/{project_name}-{timestamp}.json"
+        json_file_exporter = JsonFileSpanExporter(file_name=file_name)
         span_processor = SimpleSpanProcessor(json_file_exporter)
         tracer_provider.add_span_processor(span_processor)
     else:
-        tracer_provider = register(project_name=project_name)
+        tracer_provider = register(
+            project_name=project_name, set_global_tracer_provider=True
+        )
+        file_name = None
 
-    return tracer_provider
+    return tracer_provider, file_name
 
 
 def setup_tracing(tracer_provider: TracerProvider, agent_type: str) -> None:

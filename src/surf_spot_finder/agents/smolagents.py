@@ -39,6 +39,7 @@ def run_smolagent(
         ToolCollection,
     )
     from mcp import StdioServerParameters
+    from surf_spot_finder.agents.prompts.smolagents import SYSTEM_PROMPT
 
     model = LiteLLMModel(
         model_id=model_id,
@@ -61,6 +62,7 @@ def run_smolagent(
                 *tool_collection.tools,
                 DuckDuckGoSearchTool(),
             ],
+            prompt_templates={"system_prompt": SYSTEM_PROMPT},
             model=model,
             add_base_tools=False,  # Turn this on if you want to let it run python code as it sees fit
         )

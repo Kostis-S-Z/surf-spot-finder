@@ -12,7 +12,7 @@ dependencies = [
   "arize-phoenix>=8.12.1",
   "fire",
   "loguru",
-  "mcp>=1.3.0",
+  "mcp==1.3.0",
   "pydantic",
   "smolagents[litellm,mcp,telemetry]>=1.10.0",
 ]
@@ -37,6 +37,7 @@ docs = [
 tests = [
   "pytest>=8,<9",
   "pytest-sugar>=0.9.6",
+  "debugpy>=1.8.13",
 ]
 
 # TODO maybe we don't want to keep this, or we want to swap this to Lumigator SDK
@@ -56,7 +57,13 @@ namespaces = false
 
 [tool.setuptools_scm]
 
+[dependency-groups]
+dev = [
+    "pre-commit>=4.1.0",
+]
+
 [project.scripts]
 surf-spot-finder = "surf_spot_finder.cli:main"
+surf-spot-finder-evaluate = "surf_spot_finder.evaluation.evaluate:main"
 # TODO maybe this would be lumigator
 start-phoenix = "phoenix.server.main:main"
