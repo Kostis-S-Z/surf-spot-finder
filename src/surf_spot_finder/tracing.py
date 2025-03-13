@@ -1,8 +1,7 @@
-from datetime import datetime
 import os
+from datetime import datetime
 
 from opentelemetry import trace
-from openinference.instrumentation.smolagents import SmolagentsInstrumentor
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export import SpanExporter
@@ -24,9 +23,9 @@ class JsonFileSpanExporter(SpanExporter):
         pass
 
 
-def setup_tracing(project_name: str, json_tracer: bool) -> TracerProvider:
+def get_tracer_provider(project_name: str, json_tracer: bool) -> TracerProvider:
     """
-    Set up tracing configuration based on the selected mode.
+    Create a tracer_provider based on the selected mode.
 
     Args:
         project_name: Name of the project for tracing
@@ -52,6 +51,27 @@ def setup_tracing(project_name: str, json_tracer: bool) -> TracerProvider:
     else:
         tracer_provider = register(project_name=project_name)
 
-    SmolagentsInstrumentor().instrument(tracer_provider=tracer_provider)
-
     return tracer_provider
+
+
+def setup_tracing(tracer_provider: TracerProvider, agent_type: str) -> None:
+    """Setup tracing for `agent_type` by instrumenting `trace_provider`.
+
+    Args:
+        tracer_provider (TracerProvider): The configured tracer provider from
+            [get_tracer_provider][surf_spot_finder.tracing.get_tracer_provider].
+        agent_type (str): The type of agent being used.
+            Must be one of the supported types in [RUNNERS][surf_spot_finder.agents.RUNNERS].
+    """
+    from surf_spot_finder.agents import validate_agent_type
+
+    validate_agent_type(agent_type)
+
+    if agent_type == "openai":
+        from openinference.instrumentation.openai import OpenAIInstrumentor
+
+        OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
+    elif agent_type == "smolagents":
+        from openinference.instrumentation.smolagents import SmolagentsInstrumentor
+
+        SmolagentsInstrumentor().instrument(tracer_provider=tracer_provider)
