@@ -37,7 +37,7 @@ def find_surf_spot(
     )
 
     logger.info("Setting up tracing")
-    tracer_provider = get_tracer_provider(
+    tracer_provider, _ = get_tracer_provider(
         project_name="surf-spot-finder", json_tracer=config.json_tracer
     )
     setup_tracing(tracer_provider, config.agent_type)
