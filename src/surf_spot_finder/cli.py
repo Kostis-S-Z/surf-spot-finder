@@ -55,3 +55,7 @@ def find_surf_spot(
 
 def main():
     Fire(find_surf_spot)
+
+
+if __name__ == "__main__":
+    main()
