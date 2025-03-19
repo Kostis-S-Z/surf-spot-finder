@@ -35,8 +35,8 @@ def test_get_tracer_provider(tmp_path, json_tracer):
 @pytest.mark.parametrize(
     "agent_type,instrumentor",
     [
-        ("openai", "openai.OpenAIInstrumentor"),
-        ("openai_multi_agent", "openai.OpenAIInstrumentor"),
+        ("openai", "openai_agents.OpenAIAgentsInstrumentor"),
+        ("openai_multi_agent", "openai_agents.OpenAIAgentsInstrumentor"),
         ("smolagents", "smolagents.SmolagentsInstrumentor"),
     ],
 )

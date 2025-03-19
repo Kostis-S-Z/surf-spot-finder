@@ -77,7 +77,6 @@ def run_openai_agent(
         tool = getattr(module, func)
         imported_tools.append(function_tool(tool))
 
-    logger.info(f"Imported tools: {imported_tools}")
     if api_key_var and api_base:
         external_client = AsyncOpenAI(
             api_key=os.environ[api_key_var],

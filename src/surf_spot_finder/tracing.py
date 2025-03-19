@@ -97,9 +97,9 @@ def setup_tracing(tracer_provider: TracerProvider, agent_type: str) -> None:
     validate_agent_type(agent_type)
 
     if "openai" in agent_type:
-        from openinference.instrumentation.openai import OpenAIInstrumentor
+        from openinference.instrumentation.openai_agents import OpenAIAgentsInstrumentor
 
-        OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
+        OpenAIAgentsInstrumentor().instrument(tracer_provider=tracer_provider)
     elif agent_type == "smolagents":
         from openinference.instrumentation.smolagents import SmolagentsInstrumentor
 
