@@ -20,6 +20,7 @@ dependencies = [
 langchain = [
   "langchain",
   "langgraph",
+  "langchain-openai>=0.3.9",
   "openinference-instrumentation-langchain"
 ]
 smolagents = [
@@ -29,7 +30,7 @@ smolagents = [
 
 openai = [
   "openai-agents",
-  "openinference-instrumentation-openai-agents"
+  "openinference-instrumentation-openai-agents>=0.1.2"
 ]
 
 mcp = [

@@ -14,6 +14,8 @@ try:
 except ImportError:
     langchain_available = False
 
+DEFAULT_RECURSION_LIMIT = 50
+
 
 @logger.catch(reraise=True)
 def run_lanchain_agent(
@@ -52,13 +54,14 @@ def run_lanchain_agent(
 
     model = init_chat_model(model_id)
     agent = create_react_agent(
-        model=model,
-        tools=imported_tools,
-        checkpointer=MemorySaver(),
+        model=model, tools=imported_tools, checkpointer=MemorySaver()
     )
     for step in agent.stream(
         {"messages": [HumanMessage(content=prompt)]},
-        {"configurable": {"thread_id": "abc123"}},
+        {
+            "configurable": {"thread_id": "abc123"},
+            "recursion_limit": DEFAULT_RECURSION_LIMIT,
+        },
         stream_mode="values",
     ):
         step["messages"][-1].pretty_print()
