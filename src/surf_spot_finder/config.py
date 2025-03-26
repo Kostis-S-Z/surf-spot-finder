@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from any_agent.schema import AgentSchema
-from pydantic import AfterValidator, BaseModel, FutureDatetime, PositiveInt
+from pydantic import AfterValidator, BaseModel, ConfigDict, FutureDatetime, PositiveInt
 
 
 INPUT_PROMPT_TEMPLATE = """
@@ -19,6 +19,8 @@ def validate_prompt(value) -> str:
 
 
 class Config(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     location: str
     max_driving_hours: PositiveInt
     date: FutureDatetime
