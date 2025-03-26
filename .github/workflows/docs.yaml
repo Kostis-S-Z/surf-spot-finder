@@ -36,8 +36,11 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Install requirements
-        run: pip install -e '.[docs]'
+      - name: Install requirements  # TODO: Remove SSF_SSH_TOKEN when repo becomes public
+        run: |
+          eval `ssh-agent -s`
+          ssh-add - <<< '${{ secrets.SSF_SSH_TOKEN }}'
+          pip install -e '.[docs]'
 
       - name: Build docs
         if: github.event_name == 'pull_request'
