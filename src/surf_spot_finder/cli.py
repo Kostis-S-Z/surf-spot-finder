@@ -35,7 +35,7 @@ def find_surf_spot(
             config.main_agent.instructions = SINGLE_AGENT_SYSTEM_PROMPT
 
     logger.info("Setting up tracing")
-    tracing_path = setup_tracing(config.framework)
+    tracing_path = setup_tracing(config.framework, "output")
 
     logger.info(f"Loading {config.framework} agent")
     logger.info(f"{config.managed_agents}")
