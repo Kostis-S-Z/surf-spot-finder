@@ -47,4 +47,15 @@ class Config(BaseModel):
         """
         with open(yaml_path, "r") as f:
             data = yaml.safe_load(f)
+        # for each tool listed in main_agent.tools, use import lib to import it and replace the str with the callable
+        callables = []
+        for tool in data["main_agent"]["tools"]:
+            if isinstance(tool, str):
+                module_name, func_name = tool.rsplit(".", 1)
+                module = __import__(module_name, fromlist=[func_name])
+                print(f"Importing {tool}")
+                callables.append(getattr(module, func_name))
+            else:
+                # this means it must be an MCPTool
+                callables.append(tool)
         return cls(**data)

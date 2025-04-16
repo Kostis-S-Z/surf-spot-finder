@@ -1,6 +1,4 @@
 from any_agent import AgentFramework, AnyAgent
-import yaml
-from pathlib import Path
 
 from fire import Fire
 from loguru import logger
@@ -26,7 +24,7 @@ def find_surf_spot(
 
     """
     logger.info(f"Loading {config_file}")
-    config = Config.model_validate(yaml.safe_load(Path(config_file).read_text()))
+    config = Config.from_yaml(config_file)
 
     if not config.main_agent.instructions:
         if config.framework == AgentFramework.SMOLAGENTS:
