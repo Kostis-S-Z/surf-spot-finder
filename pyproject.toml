@@ -11,10 +11,11 @@ dynamic = ["version"]
 dependencies = [
   "any-agent[all]",
   "fire",
-  "loguru",
   "pydantic",
   "pyyaml",
   "litellm",
+  "geocoder>=1.38.1",
+  "rich>=14.0.0",
 ]
 
 [project.optional-dependencies]
