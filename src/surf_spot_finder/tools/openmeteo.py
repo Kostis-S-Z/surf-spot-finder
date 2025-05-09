@@ -24,7 +24,7 @@ def _filter_by_date(
     ]
 
 
-def get_wave_forecast(lat: float, lon: float, date: str | None = None) -> list[dict]:
+def get_wave_forecast(lat: float, lon: float, date: str) -> list[dict]:
     """Get wave forecast for given location.
 
     Forecast will include:
@@ -38,7 +38,6 @@ def get_wave_forecast(lat: float, lon: float, date: str | None = None) -> list[d
         lat: Latitude of the location.
         lon: Longitude of the location.
         date: Date to filter by in any valid ISO 8601 format.
-            If not provided, all data (default to 6 days forecast) will be returned.
 
     Returns:
         Hourly data for wave forecast.
@@ -74,7 +73,7 @@ def get_wave_forecast(lat: float, lon: float, date: str | None = None) -> list[d
     return hourly_data
 
 
-def get_wind_forecast(lat: float, lon: float, date: str | None = None) -> list[dict]:
+def get_wind_forecast(lat: float, lon: float, date: str) -> list[dict]:
     """Get wind forecast for given location.
 
     Forecast will include:
@@ -86,7 +85,6 @@ def get_wind_forecast(lat: float, lon: float, date: str | None = None) -> list[d
         lat: Latitude of the location.
         lon: Longitude of the location.
         date: Date to filter by in any valid ISO 8601 format.
-            If not provided, all data (default to 6 days forecast) will be returned.
 
     Returns:
         Hourly data for wind forecast.
@@ -109,9 +107,8 @@ def get_wind_forecast(lat: float, lon: float, date: str | None = None) -> list[d
     response.raise_for_status()
     data = json.loads(response.content.decode())
     hourly_data = _extract_hourly_data(data)
-    if date is not None:
-        date = datetime.fromisoformat(date)
-        hourly_data = _filter_by_date(date, hourly_data)
+    date = datetime.fromisoformat(date)
+    hourly_data = _filter_by_date(date, hourly_data)
     if len(hourly_data) == 0:
         raise ValueError("No data found for the given date")
     return hourly_data
