@@ -57,7 +57,9 @@ def test_get_wave_forecast():
             }
         )
         mock_get.return_value = mock_response
-        result = openmeteo.get_wave_forecast(lat=40.0, lon=-3.0)
+        result = openmeteo.get_wave_forecast(
+            lat=40.0, lon=-3.0, date="2023-02-02T01:00"
+        )
 
         assert len(result) == 2
         assert result[1]["time"] == "2023-02-02T01:00"
@@ -88,7 +90,9 @@ def test_get_wind_forecast():
         )
         mock_get.return_value = mock_response
 
-        result = openmeteo.get_wind_forecast(lat=40.0, lon=-3.0)
+        result = openmeteo.get_wind_forecast(
+            lat=40.0, lon=-3.0, date="2023-02-02T01:00"
+        )
         assert len(result) == 2
         assert result[1]["time"] == "2023-02-02T01:00"
         assert result[1]["winddirection_10m"] == 280
