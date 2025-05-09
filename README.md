@@ -9,6 +9,12 @@
   </picture>
 </p>
 
+<div align="center">
+    <a href="https://huggingface.co/spaces/mozilla-ai/surf-spot-finder" target="_blank">Huggingface Demo 🤗</a>
+</div>
+
+
+
 Many Large Language Model (LLM) capabilities are unlocked when they are given access to tools and given control of their
 own runtime and execution path. However, it's important that as they are given greater capabilities, they are properly
 evaluated and controlled.
