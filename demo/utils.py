@@ -84,17 +84,23 @@ async def run_agent(user_inputs: dict[str, Any]):
                 if span.attributes:
                     # st.json(span.attributes, expanded=False)
                     if "input.value" in span.attributes:
-                        input_value = json.loads(span.attributes["input.value"])
-                        if isinstance(input_value, list) and len(input_value) > 0:
-                            st.write(f"Input: {input_value[-1]}")
-                        else:
-                            st.write(f"Input: {input_value}")
+                        try:
+                            input_value = json.loads(span.attributes["input.value"])
+                            if isinstance(input_value, list) and len(input_value) > 0:
+                                st.write(f"Input: {input_value[-1]}")
+                            else:
+                                st.write(f"Input: {input_value}")
+                        except:  # noqa: E722
+                            st.write(f"Input: {span.attributes['input.value']}")
                     if "output.value" in span.attributes:
-                        output_value = json.loads(span.attributes["output.value"])
-                        if isinstance(output_value, list) and len(output_value) > 0:
-                            st.write(f"Output: {output_value[-1]}")
-                        else:
-                            st.write(f"Output: {output_value}")
+                        try:
+                            output_value = json.loads(span.attributes["output.value"])
+                            if isinstance(output_value, list) and len(output_value) > 0:
+                                st.write(f"Output: {output_value[-1]}")
+                            else:
+                                st.write(f"Output: {output_value}")
+                        except:  # noqa: E722
+                            st.write(f"Output: {span.attributes['output.value']}")
             with col2:
                 status_color = (
                     "green" if span.status.status_code == StatusCode.OK else "red"
