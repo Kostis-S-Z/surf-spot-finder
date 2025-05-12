@@ -85,13 +85,13 @@ async def run_agent(user_inputs: dict[str, Any]):
                     # st.json(span.attributes, expanded=False)
                     if "input.value" in span.attributes:
                         input_value = json.loads(span.attributes["input.value"])
-                        if isinstance(input_value, list):
+                        if isinstance(input_value, list) and len(input_value) > 0:
                             st.write(f"Input: {input_value[-1]}")
                         else:
                             st.write(f"Input: {input_value}")
                     if "output.value" in span.attributes:
                         output_value = json.loads(span.attributes["output.value"])
-                        if isinstance(output_value, list):
+                        if isinstance(output_value, list) and len(output_value) > 0:
                             st.write(f"Output: {output_value[-1]}")
                         else:
                             st.write(f"Output: {output_value}")
