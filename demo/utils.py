@@ -1,6 +1,7 @@
 import json
 from typing import Any
 import streamlit as st
+import time
 from surf_spot_finder.tools import (
     driving_hours_to_meters,
     get_area_lat_lon,
@@ -10,7 +11,7 @@ from surf_spot_finder.tools import (
 )
 from surf_spot_finder.config import Config
 from any_agent import AgentConfig, AnyAgent, TracingConfig
-from any_agent.tracing.trace import AgentTrace
+from any_agent.tracing.trace import AgentTrace, TotalTokenUseAndCost
 from any_agent.tracing.otel_types import StatusCode
 from any_agent.evaluation import evaluate, TraceEvaluationResult
 
@@ -66,11 +67,24 @@ async def run_agent(user_inputs: dict[str, Any]):
     st.markdown("#### 📝 Query")
     st.code(query, language="text")
 
+    start_time = time.time()
     with st.spinner("🤔 Analyzing surf spots..."):
         agent_trace: AgentTrace = await agent.run_async(query)
         agent.exit()
 
+    end_time = time.time()
+    execution_time = end_time - start_time
+
+    cost: TotalTokenUseAndCost = agent_trace.get_total_cost()
+
     st.markdown("### 🏄 Results")
+    time_col, cost_col, tokens_col = st.columns(3)
+    with time_col:
+        st.info(f"⏱️ Execution Time: {execution_time:.2f} seconds")
+    with cost_col:
+        st.info(f"💰 Estimated Cost: ${cost.total_cost:.6f}")
+    with tokens_col:
+        st.info(f"📦 Total Tokens: {cost.total_tokens:,}")
     st.markdown("#### Final Output")
     st.info(agent_trace.final_output)
 
