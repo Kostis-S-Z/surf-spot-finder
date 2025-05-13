@@ -1,11 +1,12 @@
 import json
 from components.inputs import UserInputs
 from constants import DEFAULT_TOOLS
+from components.agent_status import export_logs
 import streamlit as st
 import time
 from surf_spot_finder.config import Config
 from any_agent import AgentConfig, AnyAgent, TracingConfig, AgentFramework
-from any_agent.tracing.trace import AgentTrace, TotalTokenUseAndCost
+from any_agent.tracing.trace import AgentTrace, TotalTokenUseAndCost, AgentSpan
 from any_agent.tracing.otel_types import StatusCode
 from any_agent.evaluation import evaluate, TraceEvaluationResult
 
@@ -102,18 +103,6 @@ async def configure_agent(user_inputs: UserInputs) -> tuple[AnyAgent, Config]:
 
 
 async def display_output(agent_trace: AgentTrace, execution_time: float):
-    cost: TotalTokenUseAndCost = agent_trace.get_total_cost()
-    with st.expander("### 🏄 Results", expanded=True):
-        time_col, cost_col, tokens_col = st.columns(3)
-        with time_col:
-            st.info(f"⏱️ Execution Time: {execution_time:.2f} seconds")
-        with cost_col:
-            st.info(f"💰 Estimated Cost: ${cost.total_cost:.6f}")
-        with tokens_col:
-            st.info(f"📦 Total Tokens: {cost.total_tokens:,}")
-        st.markdown("#### Final Output")
-        st.info(agent_trace.final_output)
-
     # Display the agent trace in a more organized way
     with st.expander("### 🧩 Agent Trace"):
         for span in agent_trace.spans:
@@ -150,6 +139,18 @@ async def display_output(agent_trace: AgentTrace, execution_time: float):
                     unsafe_allow_html=True,
                 )
 
+    cost: TotalTokenUseAndCost = agent_trace.get_total_cost()
+    with st.expander("### 🏄 Results", expanded=True):
+        time_col, cost_col, tokens_col = st.columns(3)
+        with time_col:
+            st.info(f"⏱️ Execution Time: {execution_time:.2f} seconds")
+        with cost_col:
+            st.info(f"💰 Estimated Cost: ${cost.total_cost:.6f}")
+        with tokens_col:
+            st.info(f"📦 Total Tokens: {cost.total_tokens:,}")
+        st.markdown("#### Final Output")
+        st.info(agent_trace.final_output)
+
 
 async def run_agent(agent, config) -> tuple[AgentTrace, float]:
     st.markdown("#### 🔍 Running Surf Spot Finder with query")
@@ -178,11 +179,54 @@ async def run_agent(agent, config) -> tuple[AgentTrace, float]:
 
         kwargs["run_config"] = RunConfig(max_llm_calls=20)
 
-    start_time = time.time()
-    with st.spinner("🤔 Analyzing surf spots..."):
-        agent_trace: AgentTrace = await agent.run_async(query, **kwargs)
-        agent.exit()
+    with st.status("Agent is running...", expanded=False, state="running") as status:
 
-    end_time = time.time()
-    execution_time = end_time - start_time
-    return agent_trace, execution_time
+        def update_span(span: AgentSpan):
+            # Process input value
+            input_value = span.attributes.get("input.value", "")
+            if input_value:
+                try:
+                    parsed_input = json.loads(input_value)
+                    if isinstance(parsed_input, list) and len(parsed_input) > 0:
+                        input_value = str(parsed_input[-1])
+                except Exception:
+                    pass
+
+            # Process output value
+            output_value = span.attributes.get("output.value", "")
+            if output_value:
+                try:
+                    parsed_output = json.loads(output_value)
+                    if isinstance(parsed_output, list) and len(parsed_output) > 0:
+                        output_value = str(parsed_output[-1])
+                except Exception:
+                    pass
+
+            # Truncate long values
+            max_length = 800
+            if len(input_value) > max_length:
+                input_value = f"[Truncated]...{input_value[-max_length:]}"
+            if len(output_value) > max_length:
+                output_value = f"[Truncated]...{output_value[-max_length:]}"
+
+            # Create a cleaner message format
+            if input_value or output_value:
+                message = f"Step: {span.name}\n"
+                if input_value:
+                    message += f"Input: {input_value}\n"
+                if output_value:
+                    message += f"Output: {output_value}"
+            else:
+                message = f"Step: {span.name}\n{span}"
+
+            status.update(label=message, expanded=False, state="running")
+
+        export_logs(agent, update_span)
+        start_time = time.time()
+        agent_trace: AgentTrace = await agent.run_async(query, **kwargs)
+        status.update(label="Finished!", expanded=False, state="complete")
+        end_time = time.time()
+
+        agent.exit()
+        execution_time = end_time - start_time
+        return agent_trace, execution_time
