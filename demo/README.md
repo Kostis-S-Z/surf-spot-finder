@@ -2,7 +2,7 @@
 title: Surf Spot Finder
 emoji: 🏄🏼‍♂️
 colorFrom: blue
-colorTo: cyan
+colorTo: indigo
 sdk: docker
 app_port: 8501
 tags:
