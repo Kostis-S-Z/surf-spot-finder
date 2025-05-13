@@ -13,7 +13,7 @@ MODEL_OPTIONS = [
     "openai/gpt-4.1-mini",
     "openai/gpt-4o",
     "gemini/gemini-2.0-flash-lite",
-    "gemini-2.0-flash",
+    "gemini/gemini-2.0-flash",
     # "huggingface/Qwen/Qwen3-32B", # right now throwing an internal error, but novita qwen isn't supporting tool calling
 ]
 
