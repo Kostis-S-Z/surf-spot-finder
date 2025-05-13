@@ -43,7 +43,6 @@ async def display_evaluation_results(result: TraceEvaluationResult):
         st.markdown(f"**{percentage:.1f}%**")
 
 
-@st.cache_resource
 async def evaluate_agent(
     config: Config, agent_trace: AgentTrace
 ) -> TraceEvaluationResult:
@@ -146,7 +145,6 @@ async def display_output(agent_trace: AgentTrace, execution_time: float):
                 )
 
 
-@st.cache_resource
 async def run_agent(agent, config) -> tuple[AgentTrace, float]:
     st.markdown("#### 🔍 Running Surf Spot Finder with query")
 
