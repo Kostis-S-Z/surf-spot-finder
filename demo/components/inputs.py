@@ -84,14 +84,14 @@ def get_user_inputs() -> UserInputs:
     framework = st.selectbox(
         "Select the agent framework to use",
         supported_frameworks,
-        index=3,
+        index=2,
         format_func=lambda x: x.name,
     )
 
     model_id = st.selectbox(
         "Select the model to use",
         MODEL_OPTIONS,
-        index=0,
+        index=1,
         format_func=lambda x: "/".join(x.split("/")[-3:]),
     )
 
