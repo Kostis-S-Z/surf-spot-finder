@@ -5,7 +5,7 @@ from components.agent_status import export_logs
 import streamlit as st
 from surf_spot_finder.config import Config
 from any_agent import AgentConfig, AnyAgent, TracingConfig, AgentFramework
-from any_agent.tracing.trace import AgentTrace, TotalTokenUseAndCost, AgentSpan
+from any_agent.tracing.trace import AgentTrace, AgentSpan
 from any_agent.tracing.otel_types import StatusCode
 from any_agent.evaluation import evaluate, TraceEvaluationResult
 
@@ -137,16 +137,15 @@ async def display_output(agent_trace: AgentTrace):
                     unsafe_allow_html=True,
                 )
 
-    cost: TotalTokenUseAndCost = agent_trace.get_total_cost()
     with st.expander("### 🏄 Results", expanded=True):
         time_col, cost_col, tokens_col = st.columns(3)
         duration = agent_trace.duration.total_seconds()
         with time_col:
             st.info(f"⏱️ Execution Time: {duration:0.2f} seconds")
         with cost_col:
-            st.info(f"💰 Estimated Cost: ${cost.total_cost:.6f}")
+            st.info(f"💰 Estimated Cost: ${agent_trace.cost.total_cost:.6f}")
         with tokens_col:
-            st.info(f"📦 Total Tokens: {cost.total_tokens:,}")
+            st.info(f"📦 Total Tokens: {agent_trace.usage.total_tokens:,}")
         st.markdown("#### Final Output")
         st.info(agent_trace.final_output)
 
