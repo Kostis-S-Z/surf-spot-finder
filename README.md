@@ -1,102 +1,74 @@
 <p align="center">
   <picture>
-    <!-- When the user prefers dark mode, show the white logo -->
-    <source media="(prefers-color-scheme: dark)" srcset="./images/Blueprint-logo-white.png">
-    <!-- When the user prefers light mode, show the black logo -->
-    <source media="(prefers-color-scheme: light)" srcset="./images/Blueprint-logo-black.png">
-    <!-- Fallback: default to the black logo -->
-    <img src="./images/Blueprint-logo-black.png" width="35%" alt="Project logo"/>
+    <source media="(prefers-color-scheme: dark)" srcset="./images/surf-spot-finder-logo-white.png">
+    <source media="(prefers-color-scheme: light)" srcset="./images/surf-spot-finder-logo-black.png">
+    <img src="./images/surf-spot-finder-logo-black.png" width="35%" alt="surf spot finder project logo"/>
   </picture>
 </p>
 
 <div align="center">
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![](https://dcbadge.limes.pink/api/server/YuMNeuKStr?style=flat)](https://discord.gg/YuMNeuKStr) <br>
-[![Try on Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue)](https://huggingface.co/spaces/mozilla-ai/surf-spot-finder)
-[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
-[![LiteLLM](https://img.shields.io/badge/🚅%20LiteLLM-1E90FF)](https://www.litellm.ai/)
-[![Any-Agent](https://img.shields.io/badge/🎨%20Any--Agent-white)](https://github.com/mozilla-ai/any-agent) <br>
-[![Docs](https://github.com/mozilla-ai/surf-spot-finder/actions/workflows/docs.yaml/badge.svg)](https://github.com/mozilla-ai/surf-spot-finder/actions/workflows/docs.yaml/)
-[![Ruff](https://github.com/mozilla-ai/surf-spot-finder/actions/workflows/lint.yaml/badge.svg?label=Ruff)](https://github.com/mozilla-ai/surf-spot-finder/actions/workflows/lint.yaml/)
 
-[Blueprints Hub](https://developer-hub.mozilla.ai/)
-| [Documentation](https://mozilla-ai.github.io/surf-spot-finder/)
+[Documentation](https://mozilla-ai.github.io/surf-spot-finder/)
 | [Getting Started](https://mozilla-ai.github.io/surf-spot-finder/getting-started)
 | [Contributing](CONTRIBUTING.md)
 
 </div>
 
-# Surf Spot Finder: a Blueprint for comparing agent frameworks on a specific task
+# Surf Spot Finder
 
-Many Large Language Model (LLM) capabilities are unlocked when they are given access to tools and given control of their
-own runtime and execution path. However, it's important that as they are given greater capabilities, they are properly
-evaluated and controlled.
+Surf Spot Finder helps you automatically identify the best surf spot for you, around a provided location, for a given date and within a specified driving distance. It leverages agent frameworks and LLMs to evaluate weather, surf, and travel data using open and extensible tool integrations.
 
-In this Blueprint, we demonstrate an AI agent designed for an extremely specific task (some refer to this as a "Vertical Agent")
-that is given the web and searching access it needs to find an answer the same way you would find the answer as a human.
+## Quick-start
 
-This agent is designed for help in finding the next great surf spot near you: the agent is provided with a location, a distance,
-a timestamp, and it's able to independently search and browse the web to recommend the best spot to you along with the
-relevant information!
-
-Although this exact use-case may not be useful to you directly, the framework we provide here is intended to be easily
-adapted to the Agent use case you have in mind.
-
-This implementation uses the [smolagents](https://huggingface.co/docs/smolagents/index) library for Agentic capabilities, alongside the increasingly popular Model Context Protocol (MCP) which allows for a standard access communication standard for a large number of tools.
-
-
-## 🚀 Quick Start
-
-Try out our demo on HF Spaces: [![Try on Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue)](https://huggingface.co/spaces/mozilla-ai/surf-spot-finder)
-
-### 1️⃣ Clone the Project
-```bash
-git clone https://github.com/mozilla-ai/surf-spot-finder.git
-cd surf-spot-finder
-```
-
-### 2️⃣ Update submodule and install dependencies
-```bash
-pip install -e .  # Install root project dependencies
-```
-
-### 3️⃣ Run
+To use Surf Spot Finder, install the package and run via command line:
 
 ```bash
-surf-spot-finder examples/single_agent_with_tools.yaml
+pip install -e .
+
+surf-spot-finder --config <path/to/config.yaml>
 ```
+
+You can also use the framework-free version:
+
+```bash
+surf-spot-finder-no-framework --location "Athens, Greece" --max_driving_hours 2 --date "2024-06-01-08" --model_id openai/gpt-4o
+```
+
+See [docs](https://mozilla-ai.github.io/surf-spot-finder/) or provided example configurations for more details.
 
 ## How it Works
 
+The Surf Spot Finder:
+- Uses configuration-driven agents (or a simplified agent-free mode) to:
+  - Search for surfing spots in a geographic radius
+  - Check forecast data (wind, wave) for chosen date
+  - Optionally browse the web for surf spot reports
+  - Score and recommend the best spot for your needs
+- Can be extended with additional tools or evaluation logic via the agent configuration files
+
+Supported agent frameworks: [smolagents](https://github.com/context-labs/smol-agents), [OpenAI](https://platform.openai.com/)
 
 ## Pre-requisites
 
-- **System requirements**:
+- **System requirements:**
   - OS: Windows, macOS, or Linux
-  - Python 3.10 or higher
-  - Minimum RAM:
-  - Disk space:
+  - Python 3.11 or higher
+  - Minimum RAM: ~2GB recommended
+  - Disk space: Minimal
 
-- **Dependencies**:
-  - Docker
-  - Dependencies listed in `pyproject.toml`
+- **Dependencies:**
+  - Listed in `pyproject.toml`, typically including: `any-agent[all]`, `fire`, `pydantic`, `pyyaml`, `litellm`, `geocoder`, `rich`
 
-## Run Tests
-
-```bash
-pip install -e .[tests]
-```
-
-### Unit Tests
-
-```bash
-pytest
-```
+- **Optional:** For demo and docs use: `gradio`, `mkdocs`, etc.
 
 ## Troubleshooting
 
+- Ensure all required Python dependencies are installed (`pip install -e .[demo,docs]` for extras)
+- Some tools require API keys (for location or weather queries, or LLMs)
+- Configuration can be customized via YAML or CLI flags; see [example configs](examples/) or `surf-spot-finder --help`.
 
 ## License
 
