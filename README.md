@@ -53,7 +53,7 @@ Try out our demo on HF Spaces: [![Try on Spaces](https://img.shields.io/badge/%F
 
 ### 1️⃣ Clone the Project
 ```bash
-git clone https://github.com/mozilla-ai/surf-spot-finder.git
+git clone https://github.com/Kostis-S-Z/surf-spot-finder.git
 cd surf-spot-finder
 ```
 
